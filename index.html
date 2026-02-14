@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Primary Meta Tags -->
+  <title>Color Contrast Checker - WCAG Accessibility Tool | CauseLabs</title>
+  <meta name="title" content="Color Contrast Checker - WCAG Accessibility Tool | CauseLabs">
+  <meta name="description"
+    content="Free WCAG color contrast checker. Test color combinations against WCAG 2.2 guidelines (Level A, AA, AAA) and get accessible color suggestions instantly.">
+  <meta name="keywords"
+    content="color contrast checker, WCAG, accessibility, a11y, contrast ratio, ADA compliance, web accessibility, color accessibility">
+  <meta name="author" content="CauseLabs">
+  <meta name="robots" content="index, follow">
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://www.causelabs.com/contrast-checker/">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.causelabs.com/contrast-checker/">
+  <meta property="og:title" content="Color Contrast Checker - WCAG Accessibility Tool">
+  <meta property="og:description"
+    content="Free WCAG color contrast checker. Test color combinations against WCAG 2.2 guidelines and get accessible color suggestions instantly.">
+  <meta property="og:site_name" content="CauseLabs">
+  <meta property="og:locale" content="en_US">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://www.causelabs.com/contrast-checker/">
+  <meta name="twitter:title" content="Color Contrast Checker - WCAG Accessibility Tool">
+  <meta name="twitter:description"
+    content="Free WCAG color contrast checker. Test color combinations against WCAG 2.2 guidelines and get accessible color suggestions instantly.">
+
+  <!-- Structured Data - WebApplication -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Color Contrast Checker",
+    "description": "Free WCAG color contrast checker. Test color combinations against WCAG 2.2 guidelines (Level A, AA, AAA) and get accessible color suggestions instantly.",
+    "url": "https://www.causelabs.com/contrast-checker/",
+    "applicationCategory": "DesignApplication",
+    "operatingSystem": "Any",
+    "browserRequirements": "Requires JavaScript",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "author": {
+      "@type": "Organization",
+      "name": "CauseLabs",
+      "url": "https://www.causelabs.com"
+    },
+    "featureList": [
+      "WCAG 2.2 compliance checking",
+      "Level A, AA, and AAA support",
+      "Automatic accessible color suggestions",
+      "Universal color finder for light and dark text"
+    ]
+  }
+  </script>
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <a href="#results-heading" class="skip-link">Skip to results</a>
+  <main class="container">
+    <header class="header">
+      <a href="https://www.causelabs.com" class="logo-link" aria-label="CauseLabs - Return to homepage">
+        <img src="logo.svg" alt="CauseLabs" class="logo" width="200" height="30">
+      </a>
+      <h1>Color Contrast Checker</h1>
+      <p class="subtitle">Find accessible color combinations that meet WCAG 2.2 guidelines</p>
+    </header>
+
+    <section class="input-section" aria-labelledby="input-heading">
+      <h2 id="input-heading" class="visually-hidden">Color Inputs</h2>
+
+      <div class="input-row">
+        <div class="color-input-group">
+          <label for="bg-color">Background Color</label>
+          <div class="color-input-wrapper">
+            <input type="color" id="bg-color-picker" class="color-picker" value="#4ac4e2"
+              aria-label="Background color picker">
+            <input type="text" id="bg-color" class="hex-input" value="#4ac4e2" placeholder="#000000" maxlength="7"
+              pattern="^#[0-9A-Fa-f]{6}$" autocomplete="off" spellcheck="false" aria-describedby="bg-color-error">
+            <span id="bg-color-error" class="error-message" aria-live="polite"></span>
+          </div>
+        </div>
+
+        <div class="color-input-group">
+          <label for="light-text">Light Text Color</label>
+          <div class="color-input-wrapper">
+            <input type="color" id="light-text-picker" class="color-picker" value="#ffffff"
+              aria-label="Light text color picker">
+            <input type="text" id="light-text" class="hex-input" value="#ffffff" placeholder="#ffffff" maxlength="7"
+              pattern="^#[0-9A-Fa-f]{6}$" autocomplete="off" spellcheck="false" aria-describedby="light-text-error">
+            <span id="light-text-error" class="error-message" aria-live="polite"></span>
+          </div>
+        </div>
+
+        <div class="color-input-group">
+          <label for="dark-text">Dark Text Color</label>
+          <div class="color-input-wrapper">
+            <input type="color" id="dark-text-picker" class="color-picker" value="#000000"
+              aria-label="Dark text color picker">
+            <input type="text" id="dark-text" class="hex-input" value="#000000" placeholder="#000000" maxlength="7"
+              pattern="^#[0-9A-Fa-f]{6}$" autocomplete="off" spellcheck="false" aria-describedby="dark-text-error">
+            <span id="dark-text-error" class="error-message" aria-live="polite"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="wcag-selector">
+        <fieldset>
+          <legend>WCAG Compliance Level</legend>
+          <div class="radio-group">
+            <label class="radio-label">
+              <input type="radio" name="wcag-level" value="A">
+              <span class="radio-text">Level A</span>
+              <span class="ratio-hint">3:1</span>
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="wcag-level" value="AA" checked>
+              <span class="radio-text">Level AA</span>
+              <span class="ratio-hint">4.5:1</span>
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="wcag-level" value="AAA">
+              <span class="radio-text">Level AAA</span>
+              <span class="ratio-hint">7:1</span>
+            </label>
+          </div>
+        </fieldset>
+      </div>
+    </section>
+
+    <section class="results-section" aria-labelledby="results-heading" aria-live="polite">
+      <h2 id="results-heading">Results</h2>
+
+      <div class="results-grid">
+        <!-- Light Text Results -->
+        <article class="result-card" id="light-result">
+          <h3>With Light Text</h3>
+          <div class="color-preview" id="light-preview">
+            <span class="preview-text" id="light-preview-text">Aa</span>
+          </div>
+          <div class="contrast-info">
+            <span class="contrast-ratio" id="light-ratio">--:1</span>
+            <span class="pass-fail" id="light-status" aria-label="Contrast status"></span>
+          </div>
+          <div class="suggestion" id="light-suggestion" hidden>
+            <p>Try this instead:</p>
+            <div class="suggested-color-wrapper">
+              <div class="suggested-preview" id="light-suggested-preview">
+                <span class="preview-text" id="light-suggested-text">Aa</span>
+              </div>
+              <button class="copy-btn" id="light-copy" aria-label="Copy suggested color">
+                <span class="hex-value" id="light-suggested-hex"></span>
+                <svg class="copy-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2" aria-hidden="true" focusable="false">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+              </button>
+            </div>
+            <span class="suggested-ratio" id="light-suggested-ratio"></span>
+          </div>
+        </article>
+
+        <!-- Dark Text Results -->
+        <article class="result-card" id="dark-result">
+          <h3>With Dark Text</h3>
+          <div class="color-preview" id="dark-preview">
+            <span class="preview-text" id="dark-preview-text">Aa</span>
+          </div>
+          <div class="contrast-info">
+            <span class="contrast-ratio" id="dark-ratio">--:1</span>
+            <span class="pass-fail" id="dark-status" aria-label="Contrast status"></span>
+          </div>
+          <div class="suggestion" id="dark-suggestion" hidden>
+            <p>Try this instead:</p>
+            <div class="suggested-color-wrapper">
+              <div class="suggested-preview" id="dark-suggested-preview">
+                <span class="preview-text" id="dark-suggested-text">Aa</span>
+              </div>
+              <button class="copy-btn" id="dark-copy" aria-label="Copy suggested color">
+                <span class="hex-value" id="dark-suggested-hex"></span>
+                <svg class="copy-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2" aria-hidden="true" focusable="false">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+              </button>
+            </div>
+            <span class="suggested-ratio" id="dark-suggested-ratio"></span>
+          </div>
+        </article>
+
+        <!-- Universal Color Results -->
+        <article class="result-card universal-card" id="universal-result">
+          <h3>Universal Color</h3>
+          <p class="universal-desc">Works with both light and dark text</p>
+          <div class="universal-preview-group">
+            <div class="color-preview universal-preview" id="universal-preview-light">
+              <span class="preview-text" id="universal-light-text">Aa</span>
+            </div>
+            <div class="color-preview universal-preview" id="universal-preview-dark">
+              <span class="preview-text" id="universal-dark-text">Aa</span>
+            </div>
+          </div>
+          <div class="universal-info" id="universal-info">
+            <div class="suggested-color-wrapper">
+              <button class="copy-btn universal-copy" id="universal-copy" aria-label="Copy universal color">
+                <span class="hex-value" id="universal-hex">--</span>
+                <svg class="copy-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2" aria-hidden="true" focusable="false">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+              </button>
+            </div>
+            <div class="universal-ratios">
+              <span id="universal-light-ratio">Light: --:1</span>
+              <span id="universal-dark-ratio">Dark: --:1</span>
+            </div>
+          </div>
+          <p class="no-universal" id="no-universal" hidden>
+            No single color variation can satisfy both constraints at this WCAG level.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="footer-row">
+        <p>Built with <span class="heart" aria-label="love" role="img">&#9829;</span> by <a
+            href="https://www.causelabs.com" rel="noopener">CauseLabs</a> &copy; 2026</p>
+        <p>Based on <a href="https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html" target="_blank"
+            rel="noopener">WCAG 2.2 Contrast Guidelines</a></p>
+      </div>
+    </footer>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden>
+    Copied to clipboard!
+  </div>
+
+  <script src="app.js"></script>
+</body>
+
+</html>

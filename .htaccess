@@ -1,0 +1,12 @@
+<IfModule mod_rewrite.c>
+RewriteEngine Off
+</IfModule>
+
+# Ensure index.html is the default
+DirectoryIndex index.html
+
+# Optional: Set proper MIME types for assets
+<IfModule mod_mime.c>
+AddType text/css .css
+AddType application/javascript .js
+</IfModule>
