@@ -385,10 +385,52 @@
   }
 
   /**
+   * Finds the highest lightness L where contrast with light text passes.
+   * (Light text needs darker background, so we find the upper bound of valid L.)
+   */
+  function findMaxLForLightText(bgHsl, lightTextHex, targetRatio) {
+    let low = 0;
+    let high = 1;
+    let bestL = null;
+    for (let i = 0; i < 50; i++) {
+      if (high - low <= SEARCH_PRECISION) break;
+      const mid = (low + high) / 2;
+      const ratio = getContrastRatio(hslToHex(bgHsl.h, bgHsl.s, mid), lightTextHex);
+      if (ratio >= targetRatio) {
+        bestL = mid;
+        low = mid;
+      } else {
+        high = mid;
+      }
+    }
+    return bestL;
+  }
+
+  /**
+   * Finds the lowest lightness L where contrast with dark text passes.
+   * (Dark text needs lighter background, so we find the lower bound of valid L.)
+   */
+  function findMinLForDarkText(bgHsl, darkTextHex, targetRatio) {
+    let low = 0;
+    let high = 1;
+    let bestL = null;
+    for (let i = 0; i < 50; i++) {
+      if (high - low <= SEARCH_PRECISION) break;
+      const mid = (low + high) / 2;
+      const ratio = getContrastRatio(hslToHex(bgHsl.h, bgHsl.s, mid), darkTextHex);
+      if (ratio >= targetRatio) {
+        bestL = mid;
+        high = mid;
+      } else {
+        low = mid;
+      }
+    }
+    return bestL;
+  }
+
+  /**
    * Finds a universal color that works with both light and dark text.
-   * 
-   * This is more constrained than single-text solutions because the
-   * color must satisfy contrast requirements in both directions.
+   * Uses the same binary-search approach as findAccessibleColor for consistency.
    * 
    * @param {string} bgHex - Original background color hex
    * @param {string} lightTextHex - Light text color hex
@@ -400,34 +442,32 @@
     const bgHsl = hexToHsl(bgHex);
     if (!bgHsl) return null;
 
-    // Search across the entire lightness spectrum
-    // Start from the original lightness and expand outward
-    const originalL = bgHsl.l;
-    let bestResult = null;
-    let minDistance = Infinity;
-
-    // Check points across the lightness spectrum
-    const steps = 200;
-    for (let i = 0; i <= steps; i++) {
-      const l = i / steps;
-      const testHex = hslToHex(bgHsl.h, bgHsl.s, l);
-      const lightRatio = getContrastRatio(testHex, lightTextHex);
-      const darkRatio = getContrastRatio(testHex, darkTextHex);
-
-      if (lightRatio >= targetRatio && darkRatio >= targetRatio) {
-        const distance = Math.abs(l - originalL);
-        if (distance < minDistance) {
-          minDistance = distance;
-          bestResult = {
-            hex: testHex.toUpperCase(),
-            lightRatio,
-            darkRatio
-          };
-        }
-      }
+    const brandLightRatio = getContrastRatio(bgHex, lightTextHex);
+    const brandDarkRatio = getContrastRatio(bgHex, darkTextHex);
+    if (brandLightRatio >= targetRatio && brandDarkRatio >= targetRatio) {
+      return {
+        hex: bgHex.toUpperCase(),
+        lightRatio: brandLightRatio,
+        darkRatio: brandDarkRatio
+      };
     }
 
-    return bestResult;
+    const originalL = bgHsl.l;
+    const L_light_max = findMaxLForLightText(bgHsl, lightTextHex, targetRatio);
+    const L_dark_min = findMinLForDarkText(bgHsl, darkTextHex, targetRatio);
+
+    if (L_light_max === null || L_dark_min === null || L_dark_min > L_light_max) {
+      return null;
+    }
+
+    // Valid range: [L_dark_min, L_light_max]. Pick L closest to original.
+    const bestL = Math.max(L_dark_min, Math.min(L_light_max, originalL));
+    const bestHex = hslToHex(bgHsl.h, bgHsl.s, bestL);
+    return {
+      hex: bestHex.toUpperCase(),
+      lightRatio: getContrastRatio(bestHex, lightTextHex),
+      darkRatio: getContrastRatio(bestHex, darkTextHex)
+    };
   }
 
   /* ============================================
@@ -452,9 +492,11 @@
     elements.darkTextPicker = document.getElementById('dark-text-picker');
     elements.wcagRadios = document.querySelectorAll('input[name="wcag-level"]');
 
-    // Light text results
-    elements.lightPreview = document.getElementById('light-preview');
-    elements.lightPreviewText = document.getElementById('light-preview-text');
+    // Brand / Light results
+    elements.lightPreview1 = document.getElementById('light-preview-1');
+    elements.lightPreview2 = document.getElementById('light-preview-2');
+    elements.lightPreviewText1 = document.getElementById('light-preview-text-1');
+    elements.lightPreviewText2 = document.getElementById('light-preview-text-2');
     elements.lightRatio = document.getElementById('light-ratio');
     elements.lightStatus = document.getElementById('light-status');
     elements.lightSuggestion = document.getElementById('light-suggestion');
@@ -464,9 +506,11 @@
     elements.lightSuggestedRatio = document.getElementById('light-suggested-ratio');
     elements.lightCopy = document.getElementById('light-copy');
 
-    // Dark text results
-    elements.darkPreview = document.getElementById('dark-preview');
-    elements.darkPreviewText = document.getElementById('dark-preview-text');
+    // Brand / Dark results
+    elements.darkPreview1 = document.getElementById('dark-preview-1');
+    elements.darkPreview2 = document.getElementById('dark-preview-2');
+    elements.darkPreviewText1 = document.getElementById('dark-preview-text-1');
+    elements.darkPreviewText2 = document.getElementById('dark-preview-text-2');
     elements.darkRatio = document.getElementById('dark-ratio');
     elements.darkStatus = document.getElementById('dark-status');
     elements.darkSuggestion = document.getElementById('dark-suggestion');
@@ -485,6 +529,9 @@
     elements.universalLightRatio = document.getElementById('universal-light-ratio');
     elements.universalDarkRatio = document.getElementById('universal-dark-ratio');
     elements.universalInfo = document.getElementById('universal-info');
+    elements.universalSuccess = document.getElementById('universal-success');
+    elements.universalInfoMsg = document.getElementById('universal-info-msg');
+    elements.universalPreviewGroup = document.getElementById('universal-preview-group');
     elements.noUniversal = document.getElementById('no-universal');
     elements.universalCopy = document.getElementById('universal-copy');
 
@@ -610,11 +657,13 @@
     const lightPasses = meetsWcagLevel(lightRatio, wcagLevel);
     const darkPasses = meetsWcagLevel(darkRatio, wcagLevel);
 
-    // Update light text results
-    elements.lightPreview.style.backgroundColor = bgHex;
-    elements.lightPreviewText.style.color = lightHex;
+    // Update Brand / Light results
+    // Swatch 1: Light text on Brand bg; Swatch 2: Brand text on Light bg
+    elements.lightPreview1.style.backgroundColor = bgHex;
+    elements.lightPreviewText1.style.color = lightHex;
+    elements.lightPreview2.style.backgroundColor = lightHex;
+    elements.lightPreviewText2.style.color = bgHex;
     elements.lightRatio.textContent = formatRatio(lightRatio);
-    // Use symbols alongside text per WCAG 1.4.1 (don't rely on color alone)
     elements.lightStatus.textContent = lightPasses ? '\u2713 Pass' : '\u2717 Fail';
     elements.lightStatus.className = 'pass-fail ' + (lightPasses ? 'pass' : 'fail');
 
@@ -634,11 +683,13 @@
       }
     }
 
-    // Update dark text results
-    elements.darkPreview.style.backgroundColor = bgHex;
-    elements.darkPreviewText.style.color = darkHex;
+    // Update Brand / Dark results
+    // Swatch 1: Dark text on Brand bg; Swatch 2: Brand text on Dark bg
+    elements.darkPreview1.style.backgroundColor = bgHex;
+    elements.darkPreviewText1.style.color = darkHex;
+    elements.darkPreview2.style.backgroundColor = darkHex;
+    elements.darkPreviewText2.style.color = bgHex;
     elements.darkRatio.textContent = formatRatio(darkRatio);
-    // Use symbols alongside text per WCAG 1.4.1 (don't rely on color alone)
     elements.darkStatus.textContent = darkPasses ? '\u2713 Pass' : '\u2717 Fail';
     elements.darkStatus.className = 'pass-fail ' + (darkPasses ? 'pass' : 'fail');
 
@@ -662,31 +713,47 @@
     const universalResult = findUniversalColor(bgHex, lightHex, darkHex, targetRatio);
 
     if (universalResult) {
-      // Show the color info, hide the error message
       elements.universalInfo.removeAttribute('hidden');
       elements.universalInfo.style.display = '';
       elements.noUniversal.setAttribute('hidden', '');
       elements.noUniversal.style.display = 'none';
-      
-      elements.universalPreviewLight.style.backgroundColor = universalResult.hex;
-      elements.universalPreviewDark.style.backgroundColor = universalResult.hex;
-      elements.universalLightText.style.color = lightHex;
-      elements.universalDarkText.style.color = darkHex;
+      elements.universalPreviewGroup.classList.remove('disabled');
+
+      const isBrandUniversal = universalResult.hex === bgHex.toUpperCase();
+      if (isBrandUniversal) {
+        elements.universalSuccess.removeAttribute('hidden');
+        elements.universalSuccess.style.display = '';
+        elements.universalInfoMsg.setAttribute('hidden', '');
+        elements.universalInfoMsg.style.display = 'none';
+      } else {
+        elements.universalSuccess.setAttribute('hidden', '');
+        elements.universalSuccess.style.display = 'none';
+        elements.universalInfoMsg.removeAttribute('hidden');
+        elements.universalInfoMsg.style.display = '';
+      }
+
+      // Swatch 1: Universal text on Light bg; Swatch 2: Universal text on Dark bg
+      elements.universalPreviewLight.style.backgroundColor = lightHex;
+      elements.universalPreviewDark.style.backgroundColor = darkHex;
+      elements.universalLightText.style.color = universalResult.hex;
+      elements.universalDarkText.style.color = universalResult.hex;
       elements.universalHex.textContent = universalResult.hex;
       elements.universalLightRatio.textContent = 'Light: ' + formatRatio(universalResult.lightRatio);
       elements.universalDarkRatio.textContent = 'Dark: ' + formatRatio(universalResult.darkRatio);
     } else {
-      // Hide the color info and copy button, show the error message
       elements.universalInfo.setAttribute('hidden', '');
       elements.universalInfo.style.display = 'none';
+      elements.universalSuccess.setAttribute('hidden', '');
+      elements.universalSuccess.style.display = 'none';
+      elements.universalInfoMsg.setAttribute('hidden', '');
+      elements.universalInfoMsg.style.display = 'none';
       elements.noUniversal.removeAttribute('hidden');
       elements.noUniversal.style.display = '';
-      
-      // Reset preview styles to gray
-      elements.universalPreviewLight.style.backgroundColor = '#e0e0e0';
-      elements.universalPreviewDark.style.backgroundColor = '#e0e0e0';
-      elements.universalLightText.style.color = lightHex;
-      elements.universalDarkText.style.color = darkHex;
+      elements.universalPreviewGroup.classList.add('disabled');
+      elements.universalPreviewLight.style.backgroundColor = '#e9ecef';
+      elements.universalPreviewDark.style.backgroundColor = '#e9ecef';
+      elements.universalLightText.style.color = '#6c757d';
+      elements.universalDarkText.style.color = '#6c757d';
     }
   }
 
@@ -698,12 +765,14 @@
    */
   function syncHexToPicker(hexInput, picker) {
     const normalized = normalizeHex(hexInput.value);
-    
-    // Auto-correct common input issues (double ##, missing #)
-    // Only update if the normalized value differs and is valid
+    const hexDigits = (hexInput.value.match(/[0-9A-Fa-f]/g) || []).length;
+
     if (isValidHex(normalized)) {
       picker.value = normalized;
-      // Update the text input to show the corrected value
+      // Don't overwrite input when expanding 3-char to 6-char - user may be typing a 6-char code
+      if (hexDigits === 3) {
+        return;
+      }
       if (hexInput.value !== normalized) {
         hexInput.value = normalized;
       }

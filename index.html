@@ -83,10 +83,10 @@
 
       <div class="input-row">
         <div class="color-input-group">
-          <label for="bg-color">Background Color</label>
+          <label for="bg-color">Brand Color</label>
           <div class="color-input-wrapper">
             <input type="color" id="bg-color-picker" class="color-picker" value="#4ac4e2"
-              aria-label="Background color picker">
+              aria-label="Brand color picker">
             <input type="text" id="bg-color" class="hex-input" value="#4ac4e2" placeholder="#000000" maxlength="7"
               pattern="^#[0-9A-Fa-f]{6}$" autocomplete="off" spellcheck="false" aria-describedby="bg-color-error">
             <span id="bg-color-error" class="error-message" aria-live="polite"></span>
@@ -94,10 +94,10 @@
         </div>
 
         <div class="color-input-group">
-          <label for="light-text">Light Text Color</label>
+          <label for="light-text">Light Color</label>
           <div class="color-input-wrapper">
             <input type="color" id="light-text-picker" class="color-picker" value="#ffffff"
-              aria-label="Light text color picker">
+              aria-label="Light color picker">
             <input type="text" id="light-text" class="hex-input" value="#ffffff" placeholder="#ffffff" maxlength="7"
               pattern="^#[0-9A-Fa-f]{6}$" autocomplete="off" spellcheck="false" aria-describedby="light-text-error">
             <span id="light-text-error" class="error-message" aria-live="polite"></span>
@@ -105,10 +105,10 @@
         </div>
 
         <div class="color-input-group">
-          <label for="dark-text">Dark Text Color</label>
+          <label for="dark-text">Dark Color</label>
           <div class="color-input-wrapper">
             <input type="color" id="dark-text-picker" class="color-picker" value="#000000"
-              aria-label="Dark text color picker">
+              aria-label="Dark color picker">
             <input type="text" id="dark-text" class="hex-input" value="#000000" placeholder="#000000" maxlength="7"
               pattern="^#[0-9A-Fa-f]{6}$" autocomplete="off" spellcheck="false" aria-describedby="dark-text-error">
             <span id="dark-text-error" class="error-message" aria-live="polite"></span>
@@ -144,11 +144,16 @@
       <h2 id="results-heading">Results</h2>
 
       <div class="results-grid">
-        <!-- Light Text Results -->
+        <!-- Brand / Light Results -->
         <article class="result-card" id="light-result">
-          <h3>With Light Text</h3>
-          <div class="color-preview" id="light-preview">
-            <span class="preview-text" id="light-preview-text">Aa</span>
+          <h3>Brand / Light</h3>
+          <div class="preview-group">
+            <div class="color-preview" id="light-preview-1">
+              <span class="preview-text" id="light-preview-text-1">Aa</span>
+            </div>
+            <div class="color-preview" id="light-preview-2">
+              <span class="preview-text" id="light-preview-text-2">Aa</span>
+            </div>
           </div>
           <div class="contrast-info">
             <span class="contrast-ratio" id="light-ratio">--:1</span>
@@ -173,11 +178,16 @@
           </div>
         </article>
 
-        <!-- Dark Text Results -->
+        <!-- Brand / Dark Results -->
         <article class="result-card" id="dark-result">
-          <h3>With Dark Text</h3>
-          <div class="color-preview" id="dark-preview">
-            <span class="preview-text" id="dark-preview-text">Aa</span>
+          <h3>Brand / Dark</h3>
+          <div class="preview-group">
+            <div class="color-preview" id="dark-preview-1">
+              <span class="preview-text" id="dark-preview-text-1">Aa</span>
+            </div>
+            <div class="color-preview" id="dark-preview-2">
+              <span class="preview-text" id="dark-preview-text-2">Aa</span>
+            </div>
           </div>
           <div class="contrast-info">
             <span class="contrast-ratio" id="dark-ratio">--:1</span>
@@ -205,8 +215,7 @@
         <!-- Universal Color Results -->
         <article class="result-card universal-card" id="universal-result">
           <h3>Universal Color</h3>
-          <p class="universal-desc">Works with both light and dark text</p>
-          <div class="universal-preview-group">
+          <div class="universal-preview-group" id="universal-preview-group">
             <div class="color-preview universal-preview" id="universal-preview-light">
               <span class="preview-text" id="universal-light-text">Aa</span>
             </div>
@@ -230,7 +239,13 @@
               <span id="universal-dark-ratio">Dark: --:1</span>
             </div>
           </div>
-          <p class="no-universal" id="no-universal" hidden>
+          <p class="universal-message universal-success" id="universal-success" hidden>
+            Your Brand color is universally compatible with the given light and dark colors.
+          </p>
+          <p class="universal-message universal-info" id="universal-info-msg" hidden>
+            The Universal Color above is compatible with both light and dark colors.
+          </p>
+          <p class="universal-message no-universal" id="no-universal" hidden>
             No single color variation can satisfy both constraints at this WCAG level.
           </p>
         </article>
